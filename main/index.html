@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+    <link rel="shortcut icon" href="../images/user.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/c42ed3031b.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="loader hidden">
+        <div class="loadingio-spinner-double-ring-qqp7dtkjxas">
+            <div class="ldio-g1meo2m66o6">
+                <div></div>
+                <div></div>
+                <div>
+                    <div></div>
+                </div>
+                <div>
+                    <div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="verification hidden">
+        <p>We have sent you an email verification link</p>
+        <p>Kindly verify your account before using Login Signup Application</p>
+        <a target="_blank" href="https://mail.google.com/">Go to Gmail</a>
+        <button onclick="location.reload()"><i class="fa-solid fa-rotate-right"></i></button>
+    </div>
+    <div class="container">
+        <nav>
+            <div class="ham_burger"><i id="ham_burger_icon" class="fa-solid fa-bars"></i></div>
+            <button id="logout_btn">Log Out</button>
+            <div id="change_theme"><i class="fa-solid fa-sun"></i></div>
+        </nav>
+        <div class="main">
+
+            <div class="col_1">
+                <h2>Side Panel</h2>
+                <ul>
+                    <li id="profile_func">Ebad Arshad</li>
+                    <li id="your_friends_func">Your Friends</li>
+                    <li id="add_friends_func">Add Friends</li>
+                    <li id="friend_req_func">Friend Request</li>
+                    <li id="message_func">Message your Friend</li>
+                    <li id="setting_func">Setting</li>
+                </ul>
+            </div>
+            <div class="col_2">
+                <div class="panel_list data hidden">
+                    <div class="heading">
+                        <h2>Ebad Arshad</h2>
+                    </div>
+                    <table cellspacing="0">
+                        <tr>
+                            <td class="tablerow_heading" id="name">Name</td>
+                            <td class="details name_details"></td>
+                        </tr>
+                        <tr>
+                            <td class="tablerow_heading" id="password">Password</td>
+                            <td class="details password_details"></td>
+                        </tr>
+                        <tr>
+                            <td class="tablerow_heading" id="email">Email</td>
+                            <td class="details email_details"></td>
+                        </tr>
+                        <tr>
+                            <td class="tablerow_heading" id="phone_number">Phone Number</td>
+                            <td class="details phone_number_details"></td>
+                        </tr>
+                        <tr>
+                            <td class="tablerow_heading" id="cnic_number">CNIC Number</td>
+                            <td class="details cnic_number_details"></td>
+                        </tr>
+                        <tr>
+                            <td class="tablerow_heading" id="user_uid">Your UID</td>
+                            <td class="details user_uid_details"></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="panel_list your_friends hidden">
+                    <div class="heading">
+                        <h2>Your Friends</h2>
+                    </div>
+                    <div class="search">
+                        <form>
+                            <input placeholder="Search Friend by Name" type="text">
+                            <div class="search_icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                        </form>
+                    </div>
+                    <div class="cards">
+                        <div class="card">
+                            <p> Name : <span>Sadiq Shah</span></p>
+                            <p> Email : <span>sadiqshah@gmail.com</span></p>
+                            <p> Phone Number : <span>03100000000</span></p>
+                            <button><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel_list add_friends ">
+                    <div class="heading">
+                        <h2>Add Friends</h2>
+                    </div>
+                    <div class="search">
+                        <form>
+                            <input placeholder="Add Friend by Name" type="text">
+                            <div class="search_icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                        </form>
+                    </div>
+                    <div class="cards"></div>
+                </div>
+                <div class="panel_list friend_req hidden">
+                    <div class="heading">
+                        <h2>Friend Request</h2>
+                    </div>
+                    <div class="cards">
+                        <!-- <div class="card">
+                            <p> Name : <span>Sadiq Shah</span></p>
+                            <p> Email : <span>sadiqshah@gmail.com</span></p>
+                            <p> Phone Number : <span>03100000000</span></p>
+                            <div class="add_remove_btn">
+                                <button><i class="fa-solid fa-check"></i></button>
+                                <button><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                        </div> -->
+                    </div>
+                </div>
+                <div class="panel_list message_friend hidden">
+                    <div class="heading">
+                        <h2>Message Friend</h2>
+                    </div>
+                    <div>
+                        <h1>in progress</h1>
+                    </div>
+                </div>
+                <div class="panel_list setting hidden">
+                    <div class="heading">
+                        <h2>Setting</h2>
+                    </div>
+                    <div>
+                        <h1>in progress</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+</body>
+
+<script src="app.js" type="module"></script>
+
+</html>

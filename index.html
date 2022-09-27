@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login-Signup</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="images/favicon.png" type="image/png">
+    <script src="https://kit.fontawesome.com/c42ed3031b.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div id="change_theme"><i class="fa-solid fa-sun"></i></div>
+    <div class="main_container">
+        <div id="main_login">
+            <div class="heading">
+                <h1>Login</h1>
+            </div>
+            <div class="loader hidden">
+                <div class="loadingio-spinner-double-ring-qqp7dtkjxas">
+                    <div class="ldio-g1meo2m66o6">
+                        <div></div>
+                        <div></div>
+                        <div>
+                            <div></div>
+                        </div>
+                        <div>
+                            <div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="inputs">
+                <form>
+                    <div id="email_div" class="id_password_input">
+                        <label for="email">Email :</label>
+                        <input type="text" name="email" id="email" placeholder="Email">
+                    </div>
+                    <div id="password_div" class="id_password_input">
+                        <label for="password">Password :</label>
+                        <div>
+                            <input type="password" name="password" id="password" placeholder="Password">
+                            <div>
+                                <i class="fa-solid eye fa-eye"></i>
+                                <i class="fa-solid hidden eye fa-eye-slash"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="login_btn">
+                        <p>Create Account</p>
+                        <button type="submit">Login</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div id="main_signup" class="hidden">
+            <div class="heading">
+                <h1>Sign Up</h1>
+            </div>
+            <div class="loader hidden">
+                <div class="loadingio-spinner-double-ring-qqp7dtkjxas">
+                    <div class="ldio-g1meo2m66o6">
+                        <div></div>
+                        <div></div>
+                        <div>
+                            <div></div>
+                        </div>
+                        <div>
+                            <div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="inputs">
+                    <div class="sliding_div">
+                        <div>
+                            <div class="row">
+                                <div id="sign_up_fname_div" class="sign_up_inputs">
+                                    <label for="signup_fname">First Name :</label>
+                                    <input type="text" name="signup_fname" id="signup_fname" placeholder="First Name">
+                                </div>
+                                <div id="sign_up_lname_div" class="sign_up_inputs">
+                                    <label for="signup_lname">Last Name :</label>
+                                    <input type="text" name="signup_lname" id="signup_lname" placeholder="Last Name">
+                                </div>
+
+                            </div>
+                            <div id="sign_up_email_div" class="sign_up_inputs">
+                                <label for="signup_email">Email :</label>
+                                <input type="text" name="signup_email" id="signup_email" placeholder="Email Address">
+                            </div>
+                            <div class="row">
+                                <div id="sign_up_password_div" class="sign_up_inputs">
+                                    <label for="signup_password">Password :</label>
+                                    <input type="text" name="signup_password" id="signup_password"
+                                        placeholder="Password">
+                                </div>
+                                <div id="sign_up_confirm_password_div" class="sign_up_inputs">
+                                    <label for="signup_confirm_password">Confirm :</label>
+                                    <input type="text" name="signup_confirm_password" id="signup_confirm_password"
+                                        placeholder="Confirm Password">
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div id="sign_up_number_div" class="sign_up_inputs">
+                                <label for="signup_number">Phone Number :</label>
+                                <input type="text" name="signup_number" id="signup_number" placeholder="03xxxxxxxxx">
+                            </div>
+                            <div id="sign_up_cnic_number_div" class="sign_up_inputs">
+                                <label for="signup_cnic_number">CNIC :</label>
+                                <input type="text" name="signup_cnic_number" id="signup_cnic_number"
+                                    placeholder="xxxxx-xxxxxxx-x">
+                            </div>
+                            <div id="sign_up_recovery_email_div" class="sign_up_inputs">
+                                <label for="signup_recovery_email">Recovery Email (optional) :</label>
+                                <input type="text" name="signup_recovery_email" id="signup_recovery_email"
+                                    placeholder="Email">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="signup_btn">
+                        <p>Login Instead</p>
+                    </div>
+                    <div class="btns">
+                        <div id="submit_btn" class="hidden">
+                            <button type="submit">Submit</button>
+                        </div>
+                        <div id="next_btn">
+                            <button type="submit">Next</button>
+                        </div>
+                        <div id="back_btn">
+                            <button class="hidden" type="submit">Back</button>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script src="app.js" type="module"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+</html>
