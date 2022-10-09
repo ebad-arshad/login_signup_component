@@ -177,8 +177,8 @@ label:hover {
     color: var(--color);
     background-color: var(--background_color);
     border: none;
+    width: 140px;
     cursor: pointer;
-    width: 100px;
     text-align: center;
 }
 
@@ -186,12 +186,12 @@ label:hover {
 #signup_btn button:hover,
 #next_btn button:hover,
 #back_btn button:hover,
-#submit_btn button:hover {
+#submit_btn button:hover,
+#profile_pic_btn:hover {
     opacity: .8;
 }
 
 /* Signup Box */
-
 
 #main_signup {
     display: flex;
@@ -206,6 +206,29 @@ label:hover {
     font-size: 16px;
 }
 
+#choose_image_box {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 20px;
+}
+
+.image_req {
+    width: fit-content;
+    font-size: 12px;
+    color: var(--background_color);
+    user-select: none;
+}
+
+#profile_pic_btn {
+    text-align: center;
+    font-size: 14px;
+    width: 150px;
+    padding: 10px;
+    background-color: var(--background_color);
+    color: var(--color);
+}
+
 /* Row */
 
 .row {
@@ -216,6 +239,13 @@ label:hover {
 
 .row div {
     width: 48%;
+}
+
+#sign_up_password_div div,
+#sign_up_confirm_password_div div {
+    display: flex;
+    align-items: center;
+    width: 100%;
 }
 
 /* Btns */

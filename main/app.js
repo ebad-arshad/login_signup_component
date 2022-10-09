@@ -9,12 +9,10 @@ import {
     doc,
     getDoc,
     getDocs,
-    setDoc,
     updateDoc,
     collection,
+    onSnapshot,
 } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js";
-
-// https://firebase.google.com/docs/reference/js/firebase.User
 
 const firebaseConfig = {
     apiKey: "AIzaSyBhg-YldrsCAlOL9KXNCFigbqtVwwSfcQs",
@@ -30,50 +28,42 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-
-window.onload = onAuthStateChanged(auth, async (user) => {
+const db = getFirestore(app);
+const loader = document.getElementsByClassName("loader")[0];
+const container = document.getElementsByClassName("container")[0];
+window.onload = onAuthStateChanged(auth, (user) => {
     if (!user) {
         location = "../index.html"
     } else {
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
-        const details = document.getElementsByClassName("details");
-        if (docSnap.exists()) {
-            details[0].innerHTML = docSnap.data().name;
-            details[1].innerHTML = docSnap.data().password;
-            details[2].innerHTML = docSnap.data().email;
-            details[3].innerHTML = docSnap.data().phone_number;
-            details[4].innerHTML = docSnap.data().cnic_number;
-            details[5].innerHTML = docSnap.data().uid;
-        } else {
-            // doc.data() will be undefined in this case
-        }
-        if (!user.emailVerified) {
-            document.getElementsByClassName("main")[0].classList.add("hidden");
-            document.getElementsByClassName("verification")[0].classList.remove("hidden");
-        }
-        // getting_hidden_div.classList.remove("hidden");
+        const user_name = document.querySelector(".data .heading h2");
+        const img_circle_box = document.querySelector(".img_circle_box img");
+        const list = document.querySelectorAll(".data_items ul li");
+        onSnapshot(doc(db, "users", user.uid), (doc) => {
+            img_circle_box.src = doc.data().profile_image;
+            user_name.innerHTML = doc.data().name;
+            list[0].innerHTML = `Name: ${doc.data().name}`;
+            list[1].innerHTML = `Password: ${doc.data().password}`;
+            list[2].innerHTML = `Email: ${doc.data().email}`;
+            list[3].innerHTML = `Phone Number: ${doc.data().phone_number}`;
+            list[4].innerHTML = `UID: ${doc.id}`;
+            load_all_friends(doc.data());
+            load_all_req(doc.data());
+            your_friends_tab(doc.data());
+            loader.classList.add("hidden");
+            container.classList.remove("hidden");
+
+        });
     }
 });
 
-const db = getFirestore(app);
+// Logout Function
 
-const querySnapshot = await getDocs(collection(db, "users"));
-const cards = document.querySelector(".add_friends .cards");
-
-querySnapshot.forEach((doc) => {
-    if (doc.data().uid !== auth.currentUser.uid) {
-        const btn_value = doc.data().req_send && "Request Sent" || `<i class="fa-solid fa-user-plus"></i>`;
-        cards.innerHTML += `
-            <div class="card" id="${doc.data().uid}">
-                <p> Name :<br /> ${doc.data().name}</p>
-                <p> Email :<br /> ${doc.data().email}</p>
-                <p> Phone Number :<br /> ${doc.data().phone_number}</p>
-                <button class="add_friend_btn" >${btn_value}</button>
-            </div>
-        `
-    }
-});
+const logout_btn = document.getElementById("logout_btn");
+logout_btn.onclick = () => {
+    signOut(auth).then(() => {
+        location = "../index.html";
+    })
+}
 
 // Changing theme of the Page
 
@@ -91,47 +81,50 @@ change_theme.addEventListener("click", e => {
     }
 })
 
-// Logout Function
-
-const logout_btn = document.getElementById("logout_btn");
-logout_btn.onclick = () => {
-    signOut(auth).then(() => {
-        location = "../index.html";
-        // location = "";
-
-    }).catch((error) => {
-        // An error happened.
-    });
-}
 
 // Opening side panel on hamburger click
 
-const ham_burger_icon = document.getElementById("ham_burger_icon");
+const ham_burger_icon = document.querySelectorAll(".ham_burger i");
 const col_1 = document.getElementsByClassName("col_1")[0];
 const col_2 = document.getElementsByClassName("col_2")[0];
+const col_2_h2 = document.querySelector(".col_1 h2");
+const ul = document.querySelector(".col_1 ul");
 let count = 0;
-ham_burger_icon.onclick = () => {
-
+ham_burger_icon[0].addEventListener("click", () => {
     if (count === 0) {
         col_1.style.width = "0%";
         col_2.style.width = "100%";
+        ul.style.display = "none";
+        col_2_h2.style.display = "none";
         count = 1;
     } else if (count === 1) {
         col_1.style.width = "25%";
         col_2.style.width = "75%";
+        setTimeout(() => {
+            ul.style.display = "block";
+            col_2_h2.style.display = "block";
+        }, 100);
         count = 0;
     }
+})
+ham_burger_icon[1].addEventListener("click", () => {
+    col_1.style.left = "0%";
+    ul.style.display = "block";
+    col_2_h2.style.display = "block";
+})
 
+// Opening and Closing side panel on small screen
 
-
+const x_mark = document.getElementsByClassName("fa-xmark")[0];
+const x_mark_func = () => {
+    col_1.style.left = "-100%";
 }
+x_mark.addEventListener("click", x_mark_func);
 
 // Changing Tabs from panel
 
-const [profile_func, your_friends_func, add_friends_func, friend_req_func, message_func, setting_func] = [document.getElementById("profile_func"), document.getElementById("your_friends_func"), document.getElementById("add_friends_func"), document.getElementById("friend_req_func"), document.getElementById("message_func"), document.getElementById("setting_func")];
-const panel_list = document.getElementsByClassName("panel_list");
-
 const changing_tabs = e => {
+    const panel_list = document.getElementsByClassName("panel_list");
     for (let i = 0; i < panel_list.length; i++) {
         panel_list[i].classList.add("hidden");
     }
@@ -139,72 +132,266 @@ const changing_tabs = e => {
         event.target.parentNode.children[j].style.background = "var(--color)";
         event.target.parentNode.children[j].style.color = "var(--background_color)";
     }
-
     panel_list[e].classList.remove("hidden");
     event.target.style.background = "var(--background_color)";
     event.target.style.color = "var(--color)";
-}
-profile_func.onclick = () => changing_tabs(0);
-your_friends_func.onclick = () => changing_tabs(1);
-add_friends_func.onclick = () => changing_tabs(2);
-friend_req_func.onclick = () => changing_tabs(3);
-message_func.onclick = () => changing_tabs(4);
-setting_func.onclick = () => changing_tabs(5);
-
-
-
-// Friend Request sending logic
-
-const add_friend_btn = document.getElementsByClassName("add_friend_btn");
-for (let i = 0; i < add_friend_btn.length; i++) {
-    add_friend_btn[i].onclick = (e) => add_friend(e);
+    x_mark_func();
 }
 
-const add_friend = async (e) => {
-    e.target.innerHTML = "Request Sent";
-    console.log(e.target.parentNode.id);
-    const updateRef = doc(db, "users", e.target.parentNode.id);
+// Showing Your Friends Cards
 
+let list_count = document.querySelectorAll(".count");
+const your_friends_tab = (user) => {
+    const your_friend = document.querySelector(".your_friends .cards");
+    let count = 0;
+    your_friend.innerHTML = "";
+    if (user.friends.length !== 0) {
+        user.friends.forEach(async (each_index) => {
+            const docRef = doc(db, "users", each_index);
+            const docSnap = await getDoc(docRef);
+            list_count[0].innerHTML = ++count;
+            your_friend.innerHTML += `
+                <div class="card">
+                        <div class="img_circle_card">
+                            <img id="img_circle" src="${docSnap.data().profile_image}" alt="">
+                        </div>
+                        <div class="break_line"></div>
+                        <p> Name : ${docSnap.data().name}</p>
+                        <p> Email : ${docSnap.data().email}</p>
+                        <p> Phone Number : ${docSnap.data().phone_number}</p>
+                        <button onclick='delete_friend("${user.uid}","${each_index}",${JSON.stringify(user.friends)},${JSON.stringify(docSnap.data().friends)})'><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `
+        });
+    }
+}
+
+// Deleting friend from Your Friends
+
+const delete_friend = async (uid, friend, friend_arr, req_senter_friends_arr) => {
+    toggling_loader("your_friends", true);
+    event.target.parentNode.remove();
+    const updateRef = doc(db, "users", uid);
+    const updateRef_2 = doc(db, "users", friend);
+    friend_arr.splice(friend_arr.indexOf(friend), 1);
+    req_senter_friends_arr.splice(friend_arr.indexOf(uid), 1);
     await updateDoc(updateRef, {
-        req_send: true,
-        req_sender: auth.currentUser.uid,
+        friends: friend_arr,
+    });
+    await updateDoc(updateRef_2, {
+        friends: req_senter_friends_arr,
+    });
+    const docSnap = await getDoc(updateRef);
+    your_friends_tab(docSnap.data());
+    toggling_loader("your_friends", false);
+    load_all_friends(docSnap.data());
+}
+
+// Showing Add Friends Cards
+
+const load_all_friends = async (user) => {
+    const cards = document.querySelector(".add_friends .cards");
+    const user_uid = user.uid;
+    cards.innerHTML = "";
+    const querySnapshot = await getDocs(collection(db, "users"));
+    querySnapshot.forEach((doc) => {
+        let flag = false;
+        if (doc.data().uid !== user_uid) {
+            if (user.friends.indexOf(doc.data().uid) !== -1) {
+                cards.innerHTML += `
+                    <div class="card" id="${doc.id}">
+                    <div class="img_circle_card">
+                        <img id="img_circle" src="${doc.data().profile_image}" alt="">
+                    </div>
+                    <div class="break_line"></div>
+                    <p> Name : ${doc.data().name}</p>
+                    <p> Email : ${doc.data().email}</p>
+                        <p> Phone Number : ${doc.data().phone_number}</p>
+                        <button class="add_friend_btn">Friend Added</button>
+                    </div>
+                `
+            }
+            else if (user.req_senders.indexOf(doc.data().uid) !== -1) {
+                cards.innerHTML += `
+                    <div class="card" id="${doc.id}">
+                    <div class="img_circle_card">
+                        <img id="img_circle" src="${doc.data().profile_image}" alt="">
+                    </div>
+                    <div class="break_line"></div>
+                    <p> Name : ${doc.data().name}</p>
+                    <p> Email : ${doc.data().email}</p>
+                        <p> Phone Number : ${doc.data().phone_number}</p>
+                        <button class="add_friend_btn">Sent Request</button>
+                    </div>
+                `
+            }
+            else {
+                for (let i = 0; i < doc.data().req_senders.length; i++) {
+                    if (doc.data().req_senders[i] === user_uid) {
+                        cards.innerHTML += `
+                            <div class="card" id="${doc.id}">
+                            <div class="img_circle_card">
+                                <img id="img_circle" src="${doc.data().profile_image}" alt="">
+                            </div>
+                            <div class="break_line"></div>
+                            <p> Name : ${doc.data().name}</p>
+                            <p> Email : ${doc.data().email}</p>
+                                <p> Phone Number : ${doc.data().phone_number}</p>
+                                <button class="add_friend_btn" onclick='cancel_request("${user_uid}", ${JSON.stringify(doc.data().req_senders)},"${doc.id}")' >Cancel Request</button>
+                            </div>
+                        `
+                        flag = true;
+                    }
+                }
+                if (flag === false) {
+                    cards.innerHTML += `
+                        <div class="card" id="${doc.id}">
+                            <div class="img_circle_card">
+                                <img id="img_circle" src="${doc.data().profile_image}" alt="">
+                            </div>
+                            <div class="break_line"></div>
+                            <p> Name : ${doc.data().name}</p>
+                            <p> Email : ${doc.data().email}</p>
+                            <p> Phone Number : ${doc.data().phone_number}</p>
+                            <button class="add_friend_btn" onclick='add_friend("${user_uid}",${JSON.stringify(doc.data().req_senders)},"${doc.id}")' ><i class="fa-solid fa-user-plus"></i></button>
+                        </div>
+                    `
+                }
+            }
+        }
     });
 }
 
-// Friend Request getting logic
+// Request Sending logic
 
-const friend_req = document.querySelector(".friend_req .cards");
+const add_friend = async (current_uid, arr, friend_uid) => {
+    const e = event.target;
+    toggling_loader("add_friends", true);
+    const updateRef = doc(db, "users", friend_uid);
+    e.innerHTML = "Cancel Request";
+    arr.push(current_uid);
+    await updateDoc(updateRef, {
+        req_senders: arr,
+    });
+    e.setAttribute("onclick", `cancel_request("${current_uid}",${JSON.stringify(arr)},"${friend_uid}")`);
+    toggling_loader("add_friends", false);
+}
 
-querySnapshot.forEach(async (document) => {
-    if (document.data().uid === auth.currentUser.uid && document.data().req_sender) {
-        const req_sender_uid = document.data().req_sender;
-        const req_documentRef = doc(db, "users", req_sender_uid);
-        const req_documentSnap = await getDoc(req_documentRef);
-        if (req_documentSnap.exists()) {
+// Cancelling Request logic
+
+const cancel_request = async (current_uid, arr, friend_uid) => {
+    const e = event.target;
+    toggling_loader("add_friends", true);
+    const updateRef = doc(db, "users", friend_uid);
+    e.innerHTML = `<i class="fa-solid fa-user-plus"></i>`;
+    arr.splice(arr.indexOf(current_uid), 1);
+    await updateDoc(updateRef, {
+        req_senders: arr,
+    });
+    e.setAttribute("onclick", `add_friend("${current_uid}",${JSON.stringify(arr)},"${friend_uid}")`);
+    toggling_loader("add_friends", false);
+}
+
+// Showing Friend Request Cards
+
+const load_all_req = (user) => {
+    const friend_req = document.querySelector(".friend_req .cards");
+    let count = 0;
+    friend_req.innerHTML = "";
+    if (user.req_senders.length !== 0) {
+        user.req_senders.forEach(async (each_index) => {
+            const docRef = doc(db, "users", each_index);
+            const docSnap = await getDoc(docRef);
+            list_count[1].innerHTML = ++count;
             friend_req.innerHTML += `
-            <div class="card">
-                <p> Name :<br /> ${req_documentSnap.data().name}</p>
-                <p> Email :<br /> ${req_documentSnap.data().email}</p>
-                <p> Phone Number :<br /> ${req_documentSnap.data().phone_number}</p>
-                <div class="add_remove_btn">
-                    <button><i class="fa-solid fa-check"></i></button>
-                    <button><i class="fa-solid fa-xmark"></i></button>
+                <div class="card">
+                        <div class="img_circle_card">
+                            <img id="img_circle" src="${docSnap.data().profile_image}" alt="">
+                        </div>
+                        <div class="break_line"></div>
+                        <p> Name : ${docSnap.data().name}</p>
+                        <p> Email : ${docSnap.data().email}</p>
+                        <p> Phone Number : ${docSnap.data().phone_number}</p>
+                        <div class="add_remove_btn">
+                            <button onclick='req_accept("${user.uid}","${each_index}",${JSON.stringify(user.req_senders)},${JSON.stringify(user.friends)},${JSON.stringify(docSnap.data().friends)})'><i class="fa-solid fa-check"></i></button>
+                            <button onclick='req_reject("${user.uid}","${each_index}",${JSON.stringify(user.req_senders)})'><i class="fa-solid fa-xmark"></i></button>
+                        </div>
                 </div>
-            </div>
-        `
-        }
+            `
+        });
     }
-});
+}
 
-// Friend Request Accepting or Canceling logic
+// Friend Request Accepting logic
+
+const req_accept = async (uid, req_senter, req_arr, friends_arr, req_senter_friends_arr) => {
+    count_change()
+    toggling_loader("friend_req", true);
+    event.target.parentNode.parentNode.remove();
+    const updateRef = doc(db, "users", uid);
+    const updateRef_2 = doc(db, "users", req_senter);
+    req_arr.splice(req_arr.indexOf(req_senter), 1);
+    friends_arr.push(req_senter);
+    req_senter_friends_arr.push(uid);
+    await updateDoc(updateRef, {
+        req_senders: req_arr,
+        friends: friends_arr,
+    });
+    await updateDoc(updateRef_2, {
+        friends: req_senter_friends_arr,
+    });
+    const docSnap = await getDoc(updateRef);
+    load_all_req(docSnap.data());
+    your_friends_tab(docSnap.data());
+    toggling_loader("friend_req", false);
+    load_all_friends(docSnap.data());
+}
+
+// Friend Request Rejecting logic
+
+const req_reject = async (uid, req_senter, req_arr) => {
+    count_change()
+    toggling_loader("friend_req", true);
+    event.target.parentNode.parentNode.remove();
+    const updateRef = doc(db, "users", uid);
+    req_arr.splice(req_arr.indexOf(req_senter), 1);
+    await updateDoc(updateRef, {
+        req_senders: req_arr,
+    });
+    const docSnap = await getDoc(updateRef);
+    load_all_req(docSnap.data());
+    toggling_loader("friend_req", false);
+    load_all_friends(docSnap.data());
+}
+
+// Toggling Loader 
+
+const toggling_loader = (class_name, flag) => {
+    document.getElementsByClassName("col_loader")[0].classList.toggle("hidden");
+    document.getElementsByClassName(class_name)[0].classList.toggle("hidden");
+    let all_list = document.querySelectorAll(".col_1 ul li");
+    for (let i = 0; i < all_list.length; i++) {
+        flag ? all_list[i].style.pointerEvents = "none" : all_list[i].style.pointerEvents = "all";
+    }
+};
+
+// Go to Chat App
+
+const go_to_chat_app = () => {
+    location = "../chat/index.html";
+}
+
+// Increament or Decrement in Friend Request changing
+
+const count_change = () => {
+    list_count[1].innerHTML = Number(list_count[1].innerHTML) - 1;
+}
 
 
-
-
-
-
-
-
-
-
-
+window.go_to_chat_app = go_to_chat_app;
+window.delete_friend = delete_friend;
+window.req_reject = req_reject;
+window.req_accept = req_accept;
+window.add_friend = add_friend;
+window.changing_tabs = changing_tabs;
+window.cancel_request = cancel_request;

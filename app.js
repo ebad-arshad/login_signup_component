@@ -7,14 +7,19 @@ import {
     signInWithEmailAndPassword,
     onAuthStateChanged,
     sendEmailVerification,
+    signOut
 } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-auth.js";
 import {
     getFirestore,
     doc,
     setDoc,
-    // getDocs,
-    // collection,
 } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js";
+import {
+    getStorage,
+    ref,
+    uploadBytesResumable,
+    getDownloadURL,
+} from "https://www.gstatic.com/firebasejs/9.10.0/firebase-storage.js";
 
 // https://firebase.google.com/docs/reference/js/firebase.User
 
@@ -32,16 +37,23 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 window.onload = onAuthStateChanged(auth, (user) => {
     if (user) {
         location = "main/index.html";
     }
 });
 
-const db = getFirestore(app);
+// Cancelling change input on pressing Tab key
+
+window.onkeydown = () => {
+    if (event.keyCode === 9) {
+        console.log(event.keyCode);
+        return false;
+    }
+}
 
 // Changing theme of the Page
-
 
 const change_theme = document.getElementById("change_theme");
 let flag = false; //To check toggle the properties to change theme  
@@ -59,14 +71,17 @@ change_theme.addEventListener("click", e => {
 
 // Making the password hidden or seen
 
-const eye = document.querySelector(".id_password_input div div");
 
-eye.addEventListener("click", () => {
-    let [eye_opened, eye_closed] = [document.getElementsByClassName("eye")[0], document.getElementsByClassName("eye")[1]];
+const eye_toggle = i => {
+    const password = document.getElementsByClassName("password")[i];
+    const eye = document.querySelectorAll(".eye_toggle div span")[i];
+    let [eye_opened, eye_closed] = [eye.children[0], eye.children[1]];
     eye_closed.classList.toggle("hidden");
     eye_opened.classList.toggle("hidden");
     eye_closed.classList.contains("hidden") ? password.setAttribute("type", "password") : password.setAttribute("type", "text");
-})
+
+}
+
 
 // When click on login button this function will check email & password is correct or not through regex
 
@@ -125,9 +140,9 @@ back_btn.onclick = e => {
     submit_btn.classList.add("hidden");
 }
 
-let [signup_fname, signup_lname, signup_email, signup_password, signup_confirm_password, signup_number, signup_cnic_number] = [document.getElementById("signup_fname"), document.getElementById("signup_lname"), document.getElementById("signup_email"), document.getElementById("signup_password"), document.getElementById("signup_confirm_password"), document.getElementById("signup_number"), document.getElementById("signup_cnic_number")];
-const [regex_name, regex_email, regex_password, regex_number, regex_cnic] = [/(^[a-zA-Z][a-zA-Z\s]{0,20}[a-zA-Z]$)/, /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, /^(?=.*\d{1})(?=.*[a-z]{1})(?=.*[A-Z]{1})(?=.*[!@#$%^&*{|}?~_=+.-]{1})(?=.*[^a-zA-Z0-9])(?!.*\s).{6,20}$/, /^03\d{9}$/, /^[0-9+]{5}-[0-9+]{7}-[0-9]{1}$/]
-const input_arr = [signup_fname, signup_lname, signup_email, signup_password, signup_number, signup_cnic_number];
+let [signup_fname, signup_lname, signup_email, signup_password, signup_confirm_password, signup_number, signup_profile_pic] = [document.getElementById("signup_fname"), document.getElementById("signup_lname"), document.getElementById("signup_email"), document.getElementById("signup_password"), document.getElementById("signup_confirm_password"), document.getElementById("signup_number"), document.getElementById("profile_pic")];
+const [regex_name, regex_email, regex_password, regex_number] = [/(^[a-zA-Z][a-zA-Z\s]{0,20}[a-zA-Z]$)/, /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, /^(?=.*\d{1})(?=.*[a-z]{1})(?=.*[A-Z]{1})(?=.*[!@#$%^&*{|}?~_=+.-]{1})(?=.*[^a-zA-Z0-9])(?!.*\s).{6,20}$/, /^03\d{9}$/]
+const input_arr = [signup_fname, signup_lname, signup_email, signup_password, signup_number, signup_profile_pic];
 next_btn.onclick = e => {
     e.preventDefault();
 
@@ -170,31 +185,36 @@ submit_btn.onclick = e => {
     if (!regex_number.test(input_arr[4].value)) {
         swal("Phone Number is Incorrect", "", "error");
         input_arr[4].focus();
-    } else if (!regex_cnic.test(input_arr[5].value)) {
-        swal("CNIC Number is Incorrect", "", "error");
-        input_arr[5].focus();
+    } else if (input_arr[5].files.length === 0) {
+        swal("Please select your Profile Picture", "", "error");
+    } else if (input_arr[5].files[0].size > 1048576) {
+        swal("Image size is greater than 1MB", "", "error");
+    } else if (input_arr[5].files[0].type.slice(0, 5) !== "image") {
+        swal("Type is not correct", "", "error");
     } else {
         loader[1].classList.toggle("hidden");
         inputs[1].classList.toggle("hidden");
         createUserWithEmailAndPassword(auth, signup_email.value, signup_password.value)
             .then(async (userCredential) => {
-
-                // Database Work here
-
                 const uid = userCredential.user.uid;
-
+                let file = input_arr[5].files[0];
+                let url = await uploadFiles(file, uid);
                 await setDoc(doc(db, "users", uid), { //Sending data throungh user uid in the collection named users
                     name: `${signup_fname.value} ${signup_lname.value}`,
                     email: signup_email.value,
                     password: signup_password.value,
                     phone_number: signup_number.value,
-                    cnic_number: signup_cnic_number.value,
+                    profile_image: url,
                     uid: uid,
+                    req_senders: [],
+                    friends: [],
                 });
-                sendEmailVerification(auth.currentUser)
-                    .then(() => {
-                    });
-                location.reload();
+                // signOut(auth).then(() => {
+                //     // Sign-out successful.
+                //   }).catch((error) => {
+                //     // An error happened.
+                //   });
+                location = "main/index.html";
             })
             .catch((error) => {
                 swal("The entered email is already in use", "", "error");
@@ -211,6 +231,40 @@ submit_btn.onclick = e => {
     }
 };
 
+// Converting Profile pic src into url
+
+const uploadFiles = (file, uid) => {
+    return new Promise((resolve, reject) => {
+        const storage = getStorage();
+        const storageRef = ref(storage, `users/${uid}.png`);
+        const uploadTask = uploadBytesResumable(storageRef, file);
+        uploadTask.on(
+            "state_changed",
+            (snapshot) => {
+                const progress =
+                    (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                // console.log("Upload is " + progress + "% done");
+                switch (snapshot.state) {
+                    case "paused":
+                        // console.log("Upload is paused");
+                        break;
+                    case "running":
+                        // console.log("Upload is running");
+                        break;
+                }
+            },
+            (error) => {
+                reject(error);
+            },
+            () => {
+                getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                    resolve(downloadURL);
+                });
+            }
+        );
+    });
+};
+
 //Toggle divs from login page to signup page 
 
 const create_account = document.querySelector("#login_btn p");
@@ -225,10 +279,5 @@ login_instead.onclick = () => {
 }
 
 
-        // Signout method
 
-        // signOut(auth).then(() => {
-        //     // Sign-out successful.
-        //   }).catch((error) => {
-        //     // An error happened.
-        //   });
+window.eye_toggle = eye_toggle;
