@@ -48,7 +48,6 @@ window.onload = onAuthStateChanged(auth, (user) => {
 
 window.onkeydown = () => {
     if (event.keyCode === 9) {
-        console.log(event.keyCode);
         return false;
     }
 }

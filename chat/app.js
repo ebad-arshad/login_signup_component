@@ -163,10 +163,18 @@ const friend_select = (friend_data, user_uid) => {
 
 submit_btn.addEventListener("click", async () => {
     event.preventDefault();
-    let date = new Date().toLocaleString();
-    date = date.toString().slice(-11).slice(0, 5) + " " + date.toString().slice(-2);
-    date = date.slice(0, 5) + " " + date.slice(-2);
-    date = date.replace(/  /g, " ");
+    let date2 = new Date();
+    let hours = date2.getHours() <= 9 ? "0" + date2.getHours() : date2.getHours();
+    if (hours > 12) {
+        hours = hours >= 22 ? hours - 12 : `0${hours - 12}`;
+    }
+    else if (hours === "00") {
+        hours = "12";
+    }
+    let minutes = date2.getMinutes() <= 9 ? "0" + date2.getMinutes() : date2.getMinutes();
+    let time_zone = date2.toString().indexOf("AM") !== -1 ? "AM" : "PM";
+    let hh_mm_ss = `${hours}:${minutes} ${time_zone}`;
+
     if (message_input.value !== "") {
         let value = message_input.value;
         message_input.value = "";
@@ -176,7 +184,7 @@ submit_btn.addEventListener("click", async () => {
             message: value,
             chatId: data.chatID,
             timeStamp: new Date(),
-            message_time: date,
+            message_time: hh_mm_ss,
         });
     }
 })
@@ -185,7 +193,6 @@ submit_btn.addEventListener("click", async () => {
 
 const showing_all_friends = async (data) => {
     const getting_li = document.querySelector(".col_1 ul");
-
 
     data.friends.forEach(async (each_index) => {
         const docRef = doc(db, "users", each_index);
@@ -199,21 +206,6 @@ const showing_all_friends = async (data) => {
     </li>
         `
     });
-
-
-
-    // const q = query(collection(db, "users"), where("uid", "!=", data.uid));
-    // const querySnapshot = await getDocs(q);
-    // querySnapshot.forEach((doc) => {
-    //     getting_li.innerHTML += `
-    //     <li onclick='changing_tabs(),friend_select(${JSON.stringify(doc.data())},"${data.uid}")'>
-    //         <div class="img_circle_box">
-    //             <img class="img_circle" src="${doc.data().profile_image}" alt="">
-    //         </div>
-    //         <p>${doc.data().name}</p>
-    //     </li>
-    //     `;
-    // });
 }
 
 // Loading All Messages

@@ -53,6 +53,7 @@ window.onload = onAuthStateChanged(auth, (user) => {
             container.classList.remove("hidden");
 
         });
+
     }
 });
 
@@ -163,6 +164,8 @@ const your_friends_tab = (user) => {
                 </div>
             `
         });
+    } else {
+        list_count[0].innerHTML = 0;
     }
 }
 
@@ -182,6 +185,7 @@ const delete_friend = async (uid, friend, friend_arr, req_senter_friends_arr) =>
         friends: req_senter_friends_arr,
     });
     const docSnap = await getDoc(updateRef);
+    list_count[0].innerHTML = Number(list_count[0].innerHTML) - 1;
     your_friends_tab(docSnap.data());
     toggling_loader("your_friends", false);
     load_all_friends(docSnap.data());
@@ -192,13 +196,13 @@ const delete_friend = async (uid, friend, friend_arr, req_senter_friends_arr) =>
 const load_all_friends = async (user) => {
     const cards = document.querySelector(".add_friends .cards");
     const user_uid = user.uid;
-    cards.innerHTML = "";
-    const querySnapshot = await getDocs(collection(db, "users"));
-    querySnapshot.forEach((doc) => {
-        let flag = false;
-        if (doc.data().uid !== user_uid) {
-            if (user.friends.indexOf(doc.data().uid) !== -1) {
-                cards.innerHTML += `
+    onSnapshot(collection(db, "users"), (querySnapshot) => {
+        cards.innerHTML = "";
+        querySnapshot.forEach((doc) => {
+            let flag = false;
+            if (doc.data().uid !== user_uid) {
+                if (user.friends.indexOf(doc.data().uid) !== -1) {
+                    cards.innerHTML += `
                     <div class="card" id="${doc.id}">
                     <div class="img_circle_card">
                         <img id="img_circle" src="${doc.data().profile_image}" alt="">
@@ -210,9 +214,9 @@ const load_all_friends = async (user) => {
                         <button class="add_friend_btn">Friend Added</button>
                     </div>
                 `
-            }
-            else if (user.req_senders.indexOf(doc.data().uid) !== -1) {
-                cards.innerHTML += `
+                }
+                else if (user.req_senders.indexOf(doc.data().uid) !== -1) {
+                    cards.innerHTML += `
                     <div class="card" id="${doc.id}">
                     <div class="img_circle_card">
                         <img id="img_circle" src="${doc.data().profile_image}" alt="">
@@ -224,11 +228,11 @@ const load_all_friends = async (user) => {
                         <button class="add_friend_btn">Sent Request</button>
                     </div>
                 `
-            }
-            else {
-                for (let i = 0; i < doc.data().req_senders.length; i++) {
-                    if (doc.data().req_senders[i] === user_uid) {
-                        cards.innerHTML += `
+                }
+                else {
+                    for (let i = 0; i < doc.data().req_senders.length; i++) {
+                        if (doc.data().req_senders[i] === user_uid) {
+                            cards.innerHTML += `
                             <div class="card" id="${doc.id}">
                             <div class="img_circle_card">
                                 <img id="img_circle" src="${doc.data().profile_image}" alt="">
@@ -240,11 +244,11 @@ const load_all_friends = async (user) => {
                                 <button class="add_friend_btn" onclick='cancel_request("${user_uid}", ${JSON.stringify(doc.data().req_senders)},"${doc.id}")' >Cancel Request</button>
                             </div>
                         `
-                        flag = true;
+                            flag = true;
+                        }
                     }
-                }
-                if (flag === false) {
-                    cards.innerHTML += `
+                    if (flag === false) {
+                        cards.innerHTML += `
                         <div class="card" id="${doc.id}">
                             <div class="img_circle_card">
                                 <img id="img_circle" src="${doc.data().profile_image}" alt="">
@@ -256,9 +260,10 @@ const load_all_friends = async (user) => {
                             <button class="add_friend_btn" onclick='add_friend("${user_uid}",${JSON.stringify(doc.data().req_senders)},"${doc.id}")' ><i class="fa-solid fa-user-plus"></i></button>
                         </div>
                     `
+                    }
                 }
             }
-        }
+        });
     });
 }
 
@@ -266,6 +271,10 @@ const load_all_friends = async (user) => {
 
 const add_friend = async (current_uid, arr, friend_uid) => {
     const e = event.target;
+    e.setAttribute("disabled", "disabled");
+    setTimeout(() => {
+        e.removeAttribute("disabled", "disabled");
+    }, 2000);
     toggling_loader("add_friends", true);
     const updateRef = doc(db, "users", friend_uid);
     e.innerHTML = "Cancel Request";
@@ -281,6 +290,10 @@ const add_friend = async (current_uid, arr, friend_uid) => {
 
 const cancel_request = async (current_uid, arr, friend_uid) => {
     const e = event.target;
+    e.setAttribute("disabled", "disabled");
+    setTimeout(() => {
+        e.removeAttribute("disabled", "disabled");
+    }, 2000);
     toggling_loader("add_friends", true);
     const updateRef = doc(db, "users", friend_uid);
     e.innerHTML = `<i class="fa-solid fa-user-plus"></i>`;
@@ -319,6 +332,8 @@ const load_all_req = (user) => {
                 </div>
             `
         });
+    } else {
+        list_count[1].innerHTML = 0;
     }
 }
 
