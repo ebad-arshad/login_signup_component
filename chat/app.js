@@ -16,6 +16,7 @@ import {
     collection,
     onSnapshot,
     orderBy,
+    deleteDoc,
 } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -156,7 +157,10 @@ const friend_select = (friend_data, user_uid) => {
         chatID = `${user_uid}${friend_data.uid}`;
     }
     sessionStorage.setItem("data", JSON.stringify({ user_uid, chatID }));
-    load_all_messages();
+
+    setTimeout(() => {
+        load_all_messages();
+    }, 2000);
 }
 
 // On Sending Message
@@ -215,24 +219,70 @@ const load_all_messages = () => {
     const data = JSON.parse(sessionStorage.getItem("data"));
     const auth = getAuth(app);
     const uid = auth.currentUser.uid;
+    let new_count = 0;
     const q = query(
         collection(db, "messages"),
         where("chatId", "==", data.chatID),
         orderBy("timeStamp", "desc")
     );
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    onSnapshot(q, (querySnapshot) => {
         chat_data.innerHTML = "";
         querySnapshot.forEach((doc) => {
             let class_name = doc.data().senter_uid === uid ? "user" : "friend";
             chat_data.innerHTML += `
-            <li class="${class_name}">${doc.data().message} <sub>${doc.data().message_time}</sub></li>
+            <li class="${class_name}">
+            <div>${doc.data().message}</div>
+            <sub>${doc.data().message_time}</sub>
+            <label for="ct${new_count}">
+                <span><i class="fa-solid fa-chevron-down"></i></span>
+            </label>
+            <input onfocus="show_options(true)" onblur="show_options(false)"
+                style="width: 0;opacity: 0;" type="text" id="ct${new_count++}">
+            <div class="options">
+                <p onclick="copy_to_clipboard()">Copy</p>
+                <p onclick="delete_message_for_everyone('${doc.id}')">Delete for Everyone</p>
+                <p onclick="delete_message_for_me()">Delete for Me</p>
+            </div>
+            </li>
             `
         });
     });
 }
 
+// Showing options on message click
+
+const show_options = (flag) => {
+    if (flag) {
+        event.target.nextElementSibling.style.visibility = "visible";
+    } else {
+        event.target.nextElementSibling.style.visibility = "hidden";
+    }
+}
+
+// Copy To Clipboard
+
+const copy_to_clipboard = () => {
+    navigator.clipboard.writeText(event.target.parentNode.parentNode.children[0].innerHTML);
+}
+
+// Delete Message For Everyone
+
+const delete_message_for_everyone = async(id) => {
+    await deleteDoc(doc(db, "messages", id));
+}
+
+// Delet Message For Me
+
+const delete_message_for_me = () => {
+
+}
 
 
 
+
+window.delete_message_for_me = delete_message_for_me;
+window.delete_message_for_everyone = delete_message_for_everyone;
+window.copy_to_clipboard = copy_to_clipboard;
+window.show_options = show_options;
 window.friend_select = friend_select;
 window.changing_tabs = changing_tabs;

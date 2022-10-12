@@ -14,17 +14,18 @@
     src: url(../fonts/Quicksand/static/Quicksand-Light.ttf);
 }
 
-.col_2 ul::-webkit-scrollbar {
-    width: 16px !important;
+.col_2 ul::-webkit-scrollbar,
+.col_1 ul::-webkit-scrollbar {
+    width: 8px !important;
 }
 
-.col_2 ul::-webkit-scrollbar-track {
+/* .col_2 ul::-webkit-scrollbar-track,.col_1 ul::-webkit-scrollbar-track {
     background: var(--color);
-}
+} */
 
-.col_2 ul::-webkit-scrollbar-thumb {
+.col_2 ul::-webkit-scrollbar-thumb,
+.col_1 ul::-webkit-scrollbar-thumb {
     background-color: var(--background_color);
-    border: 3px solid var(--color);
 }
 
 * {
@@ -64,7 +65,7 @@ body {
     cursor: pointer;
     margin: 20px 25px;
     font-size: 30px;
-    color: var(--color);
+    color: #fff;
     transition: .2s ease-in-out;
 }
 
@@ -277,33 +278,36 @@ nav button:hover {
 
 .main {
     display: flex;
-    min-height: calc(100vh - 80px);
+    height: calc(100vh - 80px);
     justify-content: space-between;
+    overflow: hidden;
 }
 
 .col_1 {
     width: 25%;
-    height: inherit;
     color: #fff;
     background: #111b21;
     transition: .2s ease-in-out;
+    border-top: 2px solid #111b21;
 }
 
 .col_1 ul {
+    border-top: 1px solid var(--color);
+    height: calc(100% - 160px);
     text-align: left;
+    overflow-y: scroll;
     display: flex;
     flex-direction: column;
     list-style: none;
 }
 
 .col_1 ul li {
-    padding: 10px 20px;
+    padding: 10px 28px 10px 20px;
     display: flex;
     cursor: pointer;
     align-items: center;
     gap: 10px;
     border-bottom: 1px solid var(--background_color);
-    /* margin: 0 20px; */
     transition: .2s ease-in-out;
 }
 
@@ -358,6 +362,7 @@ nav button:hover {
 }
 
 .user_data {
+    height: 100px !important;
     color: #fff;
     display: flex;
     align-items: center;
@@ -369,6 +374,7 @@ nav button:hover {
 /* Search */
 
 .search {
+    height: 40px;
     width: 90%;
     margin: 10px auto;
     background: red;
@@ -406,8 +412,9 @@ nav button:hover {
 }
 
 .chat_head .user_data {
-    padding: 19px;
+    padding: 20px !important;
     background: #111b21;
+    border-left: 1px solid var(--default);
 }
 
 /* Chat Input */
@@ -452,6 +459,8 @@ nav button:hover {
     color: #fff;
 }
 
+
+
 /* Chat Data */
 
 .chat_data {
@@ -461,7 +470,7 @@ nav button:hover {
 .chat_data ul {
     display: flex;
     flex-direction: column-reverse;
-    padding: 0 10%;
+    padding: 0 calc(10% - 8px) 0 10%;
     width: 100%;
     margin: 72px auto;
     list-style: none;
@@ -470,27 +479,87 @@ nav button:hover {
 }
 
 .chat_data ul li {
+    position: relative;
     max-width: 70%;
     word-wrap: break-word;
     width: fit-content;
     padding: 10px 10px 6px 10px;
     font-size: 14px;
+    cursor: default;
+    /* overflow: hidden; */
+}
+
+.options {
+    position: absolute;
+    z-index: 100;
+    top: -85px;
+    visibility: hidden;
+    right: 0;
+    background: var(--default);
+    width: 150px;
+    transition: .2s;
+    user-select: none;
+}
+
+.options p {
+    padding: 5px;
+    cursor: pointer;
+}
+
+.options p:hover {
+    opacity: .7;
+}
+
+.chat_data ul li span {
+    position: absolute;
+    top: 3px;
+    right: 0;
+    opacity: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    background: var(--default);
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: .1s;
+}
+
+.chat_data ul li:hover span {
+    transition: .1s;
+    opacity: 1;
 }
 
 .user {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     margin: 5px 0 0 auto !important;
     background: #005c4b;
     border-radius: 5px;
 }
 
 .friend {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 5px 0 0 auto !important;
     background: #111b21;
     margin: 5px auto 0 0 !important;
     border-radius: 5px;
 }
 
 sub {
-    padding: 0 0 0 12px;
+    position: relative;
+    top: 4px;
+    padding: 0px 0 0 12px;
     font-size: 10px;
     color: rgb(182, 182, 182);
 }
@@ -513,6 +582,10 @@ sub {
         top: 0;
         left: -100%;
         height: 100vh;
+    }
+
+    .col_1 ul {
+        height: calc(100% - 230px);
     }
 
     .close_nav {
