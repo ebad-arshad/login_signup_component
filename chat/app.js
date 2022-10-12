@@ -52,8 +52,8 @@ window.onload = onAuthStateChanged(auth, async (user) => {
         <p>${docSnap.data().name}</p>
         `
         showing_all_friends(docSnap.data());
-        container.classList.remove("hidden");
-        loader.classList.add("hidden");
+        // container.classList.remove("hidden");
+        // loader.classList.add("hidden");
     }
 });
 
@@ -159,7 +159,7 @@ const friend_select = (friend_data, user_uid) => {
     sessionStorage.setItem("data", JSON.stringify({ user_uid, chatID }));
 
     setTimeout(() => {
-        load_all_messages();
+        load_all_messages(user_uid);
     }, 2000);
 }
 
@@ -194,7 +194,7 @@ submit_btn.addEventListener("click", async () => {
 })
 
 // Showing All Friends 
-
+let friend_chat_list;
 const showing_all_friends = async (data) => {
     const getting_li = document.querySelector(".col_1 ul");
 
@@ -207,18 +207,18 @@ const showing_all_friends = async (data) => {
             <img class="img_circle" src="${docSnap.data().profile_image}" alt="">
         </div>
         <p>${docSnap.data().name}</p>
-    </li>
+        </li>
         `
+        friend_chat_list = document.getElementById("friend_chat_list").children;
     });
 }
 
 // Loading All Messages
 
-const load_all_messages = () => {
+const load_all_messages = (user_uid) => {
     let chat_data = document.getElementsByClassName("chat_data")[0].children[0];
     const data = JSON.parse(sessionStorage.getItem("data"));
-    const auth = getAuth(app);
-    const uid = auth.currentUser.uid;
+    const uid = user_uid;
     let new_count = 0;
     const q = query(
         collection(db, "messages"),
@@ -228,23 +228,28 @@ const load_all_messages = () => {
     onSnapshot(q, (querySnapshot) => {
         chat_data.innerHTML = "";
         querySnapshot.forEach((doc) => {
-            let class_name = doc.data().senter_uid === uid ? "user" : "friend";
-            chat_data.innerHTML += `
-            <li class="${class_name}">
-            <div>${doc.data().message}</div>
-            <sub>${doc.data().message_time}</sub>
+            if (doc.data().delete_for !== uid) {
+                let class_name = doc.data().senter_uid === uid ? "user" : "friend";
+                let option = doc.data().senter_uid === uid ? `
             <label for="ct${new_count}">
                 <span><i class="fa-solid fa-chevron-down"></i></span>
             </label>
             <input onfocus="show_options(true)" onblur="show_options(false)"
-                style="width: 0;opacity: 0;" type="text" id="ct${new_count++}">
+                style="width: 0;opacity: 0;" type="text" id="ct${new_count++}" readonly>
             <div class="options">
                 <p onclick="copy_to_clipboard()">Copy</p>
                 <p onclick="delete_message_for_everyone('${doc.id}')">Delete for Everyone</p>
-                <p onclick="delete_message_for_me()">Delete for Me</p>
+                <p onclick="delete_message_for_me('${doc.id}','${uid}')">Delete for Me</p>
             </div>
+            ` : "";
+                chat_data.innerHTML += `
+            <li class="${class_name}">
+            <div>${doc.data().message}</div>
+            <sub>${doc.data().message_time}</sub>
+            ${option}
             </li>
             `
+            }
         });
     });
 }
@@ -267,15 +272,49 @@ const copy_to_clipboard = () => {
 
 // Delete Message For Everyone
 
-const delete_message_for_everyone = async(id) => {
+const delete_message_for_everyone = async (id) => {
     await deleteDoc(doc(db, "messages", id));
 }
 
-// Delet Message For Me
+// Delete Message For Me
 
-const delete_message_for_me = () => {
-
+const delete_message_for_me = async (id, user_uid) => {
+    const docRef = doc(db, "messages", id);
+    await updateDoc(docRef, {
+        delete_for: user_uid,
+    });
 }
+
+// Filter Search
+const friend_chat_search = document.getElementById("friend_chat_search");
+friend_chat_search.addEventListener("keyup", () => {
+    if (friend_chat_search.value === "") {
+        for (let i = 0; i < friend_chat_list.length; i++) {
+            friend_chat_list[i].style.display = "flex";
+        }
+    }
+    else {
+        let lowerized_friend_chat_search = friend_chat_search.value.toLowerCase();
+        for (let i = 0; i < friend_chat_list.length; i++) {
+            let lowerized_friend_chat_list = friend_chat_list[i].children[1].innerHTML.toLowerCase();
+            if (lowerized_friend_chat_list.indexOf(lowerized_friend_chat_search) === -1) {
+                friend_chat_list[i].style.display = "none";
+            }else {
+                friend_chat_list[i].style.display = "flex";
+            }
+        }
+    }
+})
+
+
+
+
+
+
+
+
+
+
 
 
 

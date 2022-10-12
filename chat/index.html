@@ -11,7 +11,7 @@
 </head>
 
 <body>
-    <div class="loader ">
+    <div class="loader hidden">
         <div class="loadingio-spinner-double-ring-qqp7dtkjxas">
             <div class="ldio-g1meo2m66o6">
                 <div></div>
@@ -25,7 +25,7 @@
             </div>
         </div>
     </div>
-    <div class="container hidden">
+    <div class="container ">
         <nav>
             <div class="ham_burger"><i id="ham_burger_icon" class="fa-solid fa-bars"></i></div>
             <div class="ham_burger"><i id="ham_burger_icon_resp" class="fa-solid fa-bars"></i></div>
@@ -42,9 +42,9 @@
                 </div>
                 <div class="search">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" placeholder="Search or start new chat">
+                    <input spellcheck="false" autocomplete="off" id="friend_chat_search" type="text" placeholder="Search or start new chat">
                 </div>
-                <ul>
+                <ul id="friend_chat_list">
                 </ul>
             </div>
             <div class="col_2">
