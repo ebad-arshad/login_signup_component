@@ -402,9 +402,39 @@ label:hover {
     display: none !important;
 }
 
+/* Sweat Alert */
 
+.swal-modal {
+    background: var(--background_color);
+}
 
+.swal-icon {
+    border-color: var(--color);
+}
 
+.swal-icon--error__line {
+    background: var(--color);
+}
+
+.swal-title {
+    color: var(--color);
+}
+
+.swal-text {
+    color: var(--color);
+}
+
+.swal-button {
+    background: var(--color);
+    color: var(--background_color);
+    border: 1px solid var(--color);
+}
+
+.swal-button:hover {
+    background: var(--background_color) !important;
+    color: var(--color);
+    border-color: var(--color);
+}
 
 
 

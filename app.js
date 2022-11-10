@@ -47,8 +47,10 @@ window.onload = onAuthStateChanged(auth, (user) => {
 // Cancelling change input on pressing Tab key
 
 window.onkeydown = () => {
-    if (event.keyCode === 9) {
-        return false;
+    if (document.activeElement === signup_confirm_password) {
+        if (event.keyCode === 9) {
+            return false;
+        }
     }
 }
 
